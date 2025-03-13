@@ -1,9 +1,12 @@
-from .main import (
+from .synergy import (
+    read_CTG_synergy_data,
     CTG_synergy, 
-    read_CTG_titration_data, 
-    read_CTG_synergy_data
 )
 
+from .titration import (
+    read_CTG_titration_data, 
+    plot_CTG_titration,
+)
 
 def _get_version():
 
