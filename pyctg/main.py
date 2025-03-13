@@ -39,7 +39,7 @@ class CTG_synergy:
 
         return df
     
-    def plot_synergy_heatmap(self, query, ax, value_col='ctg', xlabel='auto', ylabel='auto', remove_ticks=False, title=None, cmap="PRGn", **args):
+    def plot_synergy_heatmap(self, query, ax, value_col='ctg', xlabel='auto', ylabel='auto', remove_ticks=False, title=None, cmap="PRGn", colorbar=True, **args):
         
         # calculate bliss synergy if needed
         if value_col == 'bliss' and not 'bliss' in self.df.columns:
@@ -73,7 +73,8 @@ class CTG_synergy:
             ax.set_xticks([])
             ax.set_yticks([])
             ax.tick_params(axis='both', which='both', length=0)
-            
+        
+        if not colorbar:
             # remove color bar from plot
             ax.collections[0].colorbar.remove()
 
