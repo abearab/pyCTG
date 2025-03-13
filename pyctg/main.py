@@ -14,15 +14,6 @@ class CTG_synergy:
         self.wide_treatment = wide_treatment
         self.narrow_treatment = narrow_treatment
     
-    def ave_replicates(self):
-        df = self.df.copy()
-        df = df.set_index(['cell_type',self.narrow_treatment,self.wide_treatment]).pivot(
-            columns='replicate', values='ctg'
-        ).mean(axis=1).reset_index()
-        df.columns = df.columns[:-1].tolist() + ['ctg']
-        
-        return df
-    
     def extract_single_treatment(self, treatment_col):
         if treatment_col == self.wide_treatment:
             other_treatment_col = self.narrow_treatment
@@ -48,19 +39,13 @@ class CTG_synergy:
 
         return df
     
-    def calculate_bliss_synergy(self):
-        model = Bliss()
-        # https://github.com/djwooten/synergy/issues/40
-        # TODO: make sure how to normalize model fit for synergy values
-        self.df['bliss'] = model.fit(
-            self.df[self.wide_treatment].to_numpy(), 
-            self.df[self.narrow_treatment].to_numpy(), 
-            self.df['ctg'].to_numpy()
-        )
-
     def plot_synergy_heatmap(self, query, ax, value_col='ctg', xlabel='auto', ylabel='auto', remove_ticks=False, title=None):
         
-        df = self.ave_replicates().query(query).copy()
+        # calculate bliss synergy if needed
+        if value_col == 'bliss' and not 'bliss' in self.df.columns:
+            df = self.calculate_bliss_synergy()
+
+        df = self.ave_replicates(value_col=value_col).query(query).copy()
 
         # Prepare the input data to be fit
         d1 = df[self.wide_treatment].to_numpy().astype(float)
@@ -93,6 +78,28 @@ class CTG_synergy:
 
         # TODO: Use dose range from data to set x/y-ticks
         # ax.set_xticks(df.Idasanutlin.unique().round(decimals=2).astype(str).tolist())
+
+    def _ave_replicates(self, value_col='ctg'):
+        df = self.df.copy()
+        df = df.set_index(['cell_type',self.narrow_treatment,self.wide_treatment]).pivot(
+            columns='replicate', values=value_col
+        ).mean(axis=1).reset_index()
+        df.columns = df.columns[:-1].tolist() + [value_col]
+        
+        return df
+    
+    def _calculate_bliss_synergy(self):
+        df = self.df.copy()
+        model = Bliss()
+        # https://github.com/djwooten/synergy/issues/40
+        # TODO: make sure how to normalize model fit for synergy values
+        self.df['bliss'] = model.fit(
+            df[self.wide_treatment].to_numpy(), 
+            df[self.narrow_treatment].to_numpy(), 
+            df['ctg'].to_numpy()
+        )
+
+        return df
 
 
 def read_CTG_titration_data(filename):
