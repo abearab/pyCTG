@@ -43,9 +43,9 @@ class CTG_synergy:
         
         # calculate bliss synergy if needed
         if value_col == 'bliss' and not 'bliss' in self.df.columns:
-            df = self.calculate_bliss_synergy()
+            df = self._calculate_bliss_synergy()
 
-        df = self.ave_replicates(value_col=value_col).query(query).copy()
+        df = self._ave_replicates(value_col=value_col).query(query).copy()
 
         # Prepare the input data to be fit
         d1 = df[self.wide_treatment].to_numpy().astype(float)
