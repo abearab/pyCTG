@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "pyCTG"
+description = "python toolbox for CellTiter-Glo® cell viability assay"
+version = "0.0.1"
+authors = [
+	"Abe Arab <abolfazl.arab@ucsf.edu>",
+]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/abearab/pyCTG"
+repository = "https://github.com/abearab/pyCTG"
+packages = [
+	{ include = "pyctg" },
+	{ include = "pyproject.toml" },
+]
+dynamic = ["version"]
+
+[tool.poetry.dependencies]
+python = ">=3.9"
+
+[tool.poetry.group.test.dependencies]
+pytest = "*"
+tomli = "*"
+
+[tool.poetry-dynamic-versioning]
+enable = true
+
+[build-system]
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
+build-backend = "poetry.core.masonry.api"
