@@ -1,4 +1,4 @@
-from main import (
+from .main import (
     CTG_synergy, 
     read_CTG_titration_data, 
     read_CTG_synergy_data
