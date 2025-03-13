@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from synergy.combination import Bliss  # or any other model
 from synergy.utils.plots import plot_heatmap
 
 
@@ -47,24 +48,24 @@ class CTG_synergy:
 
         return df
     
-    def fit_synergy_model(self):
-        # model = MuSyC(E_bounds=(0, 1), h_bounds=(1e-3, 1e3), alpha_bounds=(1e-3, 1e3))
-        # model = Bliss()
+    def calculate_bliss_synergy(self):
+        model = Bliss()
         # https://github.com/djwooten/synergy/issues/40
         # TODO: make sure how to normalize model fit for synergy values
-        # Fit the model (bootstrap_iterations is an option for some models to estimate parameter
-        # _ = model.fit(d1, d2, E)
-        # S = model._get_synergy(d1, d2, E)
-        pass
+        self.df['bliss'] = model.fit(
+            self.df[self.wide_treatment].to_numpy(), 
+            self.df[self.narrow_treatment].to_numpy(), 
+            self.df['ctg'].to_numpy()
+        )
 
-    def plot_synergy_heatmap(self, query, ax, xlabel='auto', ylabel='auto', remove_ticks=False, title=None):
+    def plot_synergy_heatmap(self, query, ax, value_col='ctg', xlabel='auto', ylabel='auto', remove_ticks=False, title=None):
         
         df = self.ave_replicates().query(query).copy()
 
         # Prepare the input data to be fit
         d1 = df[self.wide_treatment].to_numpy().astype(float)
         d2 = df[self.narrow_treatment].to_numpy().astype(float)
-        E = df["ctg"].to_numpy().astype(float)
+        E = df[value_col].to_numpy().astype(float)
 
         if xlabel == 'auto':
             xlabel = self.wide_treatment
