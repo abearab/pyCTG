@@ -14,7 +14,7 @@ class CTG_synergy:
         self.wide_treatment = wide_treatment
         self.narrow_treatment = narrow_treatment
     
-    def extract_single_treatment(self, treatment_col, value_col='effect'):
+    def extract_single_treatment(self, treatment_col, value_col='viability'):
         if treatment_col == self.wide_treatment:
             other_treatment_col = self.narrow_treatment
         elif treatment_col == self.narrow_treatment:
@@ -32,7 +32,7 @@ class CTG_synergy:
 
         return df
     
-    def plot_synergy_heatmap(self, query, ax, value_col='effect', xlabel='auto', ylabel='auto', remove_ticks=False, title=None, cmap="PRGn", colorbar=True, **args):
+    def plot_synergy_heatmap(self, query, ax, value_col='viability', xlabel='auto', ylabel='auto', remove_ticks=False, title=None, cmap="PRGn", colorbar=True, **args):
         
         # calculate bliss synergy if needed
         if value_col == 'bliss' and not 'bliss' in self.df.columns:
@@ -74,7 +74,7 @@ class CTG_synergy:
         # TODO: Use dose range from data to set x/y-ticks
         # ax.set_xticks(df.Idasanutlin.unique().round(decimals=2).astype(str).tolist())
 
-    def _ave_replicates(self, value_col='effect'):
+    def _ave_replicates(self, value_col='viability'):
         df = self.df.copy()
         df = df.set_index(['cell_type',self.narrow_treatment,self.wide_treatment]).pivot(
             columns='replicate', values=value_col
@@ -83,7 +83,7 @@ class CTG_synergy:
         
         return df
     
-    def _calculate_bliss_synergy(self,value_col='effect'):
+    def _calculate_bliss_synergy(self,value_col='viability'):
         df = self.df.copy()
         model = Bliss()
         # https://github.com/djwooten/synergy/issues/40
@@ -126,7 +126,7 @@ def read_CTG_synergy_data(filename):
             (df.replicate == row['replicate']), 
             'baseline'] = row['ctg']
 
-    df['effect'] = df['ctg'] / df['baseline']
+    df['viability'] = df['ctg'] / df['baseline'] % 100
     del df['baseline']
 
     return CTG_synergy(df, wide_treatment, narrow_treatment)

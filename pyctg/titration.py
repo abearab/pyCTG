@@ -22,13 +22,15 @@ def read_CTG_titration_data(filename):
     for col in ['ctg', 'Compound Conc']:
         df[col] = df[col].round(decimals=3)
     
+    #TODO: calculate relative CTG values (normalized to baseline, i.e. no treatment) 
+
     return df
 
 
-def plot_CTG_titration(ctg_data, treatment_name, title=None, ymax=115, ymin=-10):
+def plot_CTG_titration(ctg_data, treatment_name, value_col='viability', title=None, ymax=115, ymin=-10):
     df = ctg_data.query(
         f'treatment == "{treatment_name}"' # & `Compound Conc` < 10000'
-    ).drop(columns=['treatment']).pivot(index=['cell_type','Compound Conc'], columns='replicate', values='ctg')
+    ).drop(columns=['treatment']).pivot(index=['cell_type','Compound Conc'], columns='replicate', values=value_col)
     df.reset_index(inplace=True)
     df.columns.name = None
 
