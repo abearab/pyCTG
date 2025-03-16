@@ -14,7 +14,7 @@ class CTG_synergy:
         self.wide_treatment = wide_treatment
         self.narrow_treatment = narrow_treatment
     
-    def extract_single_treatment(self, treatment_col, value_col='viability'):
+    def extract_single_treatment(self, treatment_col):
         if treatment_col == self.wide_treatment:
             other_treatment_col = self.narrow_treatment
         elif treatment_col == self.narrow_treatment:
@@ -36,7 +36,8 @@ class CTG_synergy:
         
         # calculate bliss synergy if needed
         if value_col == 'bliss' and not 'bliss' in self.df.columns:
-            df = self._calculate_bliss_synergy()
+            df = self._calculate_bliss_synergy(value_col=value_col)
+        
 
         df = self._ave_replicates(value_col=value_col).query(query).copy()
 
@@ -74,7 +75,7 @@ class CTG_synergy:
         # TODO: Use dose range from data to set x/y-ticks
         # ax.set_xticks(df.Idasanutlin.unique().round(decimals=2).astype(str).tolist())
 
-    def _ave_replicates(self, value_col='viability'):
+    def _ave_replicates(self, value_col):
         df = self.df.copy()
         df = df.set_index(['cell_type',self.narrow_treatment,self.wide_treatment]).pivot(
             columns='replicate', values=value_col
@@ -83,7 +84,7 @@ class CTG_synergy:
         
         return df
     
-    def _calculate_bliss_synergy(self,value_col='viability'):
+    def _calculate_bliss_synergy(self,value_col):
         df = self.df.copy()
         model = Bliss()
         # https://github.com/djwooten/synergy/issues/40
@@ -126,8 +127,8 @@ def read_CTG_synergy_data(filename):
             (df.replicate == row['replicate']), 
             'baseline'] = row['ctg']
 
-    # % viability
-    df['viability'] = (df['ctg'] / df['baseline']) * 100 
+    # viability
+    df['viability'] = (df['ctg'] / df['baseline'])
     del df['baseline']
 
     return CTG_synergy(df, wide_treatment, narrow_treatment)

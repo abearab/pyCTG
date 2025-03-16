@@ -53,7 +53,7 @@ def plot_CTG_titration(ctg_data, treatment_name, value_col='viability', title=No
                                 response_col=['rep1', 'rep2', 'rep3'], # % Inhibition Avg
                                 plot_title=title,
                                 xlabel=treatment_label,
-                                ylabel='Viability %',
+                                ylabel='Viability',
                                 errorbar='sd',
                                 legend=True,
                                 #    hline=75,
