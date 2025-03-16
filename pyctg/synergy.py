@@ -25,13 +25,6 @@ class CTG_synergy:
         df = self.df.copy()
         df = df.query(f'{other_treatment_col} == 0').drop(columns=[other_treatment_col])
 
-        # Normalize each replicate's control (i.e. 0 treatment) for each cell type
-        control_values = df[df[treatment_col] == 0].groupby(['cell_type', 'replicate'])[value_col].mean().reset_index()
-        control_values = control_values.rename(columns={value_col: 'control_value'})
-        df = df.merge(control_values, on=['cell_type', 'replicate'])
-        df[value_col] = df[value_col] / df['control_value'] * 100
-        df = df.drop(columns=['control_value'])
-
         df = df.rename(columns={treatment_col: 'Compound Conc'})
         df.insert(0, 'treatment', treatment_col)
 
