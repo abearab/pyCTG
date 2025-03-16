@@ -84,7 +84,7 @@ class CTG_synergy:
         
         return df
     
-    def _calculate_bliss_synergy(self,value_col):
+    def _calculate_bliss_synergy(self):
         df = self.df.copy()
         model = Bliss()
         # https://github.com/djwooten/synergy/issues/40
@@ -92,7 +92,7 @@ class CTG_synergy:
         self.df['bliss'] = model.fit(
             df[self.wide_treatment].to_numpy(), 
             df[self.narrow_treatment].to_numpy(), 
-            df[value_col].to_numpy()
+            df['viability'].to_numpy()
         )
 
         return df
