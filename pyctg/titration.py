@@ -27,7 +27,7 @@ def read_CTG_titration_data(filename):
     return df
 
 
-def plot_CTG_titration(ctg_data, treatment_name, value_col='viability', title=None, ymax=115, ymin=-10):
+def plot_CTG_titration(ctg_data, treatment_name, value_col='viability', title=None, ymax=1.1, ymin=-0.1):
     df = ctg_data.query(
         f'treatment == "{treatment_name}"' # & `Compound Conc` < 10000'
     ).drop(columns=['treatment']).pivot(index=['cell_type','Compound Conc'], columns='replicate', values=value_col)
