@@ -84,18 +84,36 @@ class CTG_synergy:
         
         return df
     
-    def _calculate_bliss_synergy(self):
+    def _calculate_bliss_synergy(self, inplace=True):
         df = self.df.copy()
-        model = Bliss()
+
         # https://github.com/djwooten/synergy/issues/40
         # TODO: make sure how to normalize model fit for synergy values
-        self.df['bliss'] = model.fit(
-            df[self.wide_treatment].to_numpy(), 
-            df[self.narrow_treatment].to_numpy(), 
-            df['viability'].to_numpy()
-        )
+        model = Bliss()
+        
+        df['bliss'] = np.nan
 
-        return df
+        for _,row in df.query(
+            f'`{self.wide_treatment}` == 0 & `{self.narrow_treatment}` == 0').iterrows():
+            single_plate = df.loc[
+                (df.cell_type == row['cell_type']) & 
+                (df.replicate == row['replicate']),:]
+
+            res = model.fit(
+                single_plate[self.wide_treatment].to_numpy(), 
+                single_plate[self.narrow_treatment].to_numpy(), 
+                single_plate['viability'].to_numpy()
+            )
+            
+            df.loc[
+                (df.cell_type == row['cell_type']) &
+                (df.replicate == row['replicate']),
+                'bliss'] = res
+        
+        if inplace:
+            self.df = df
+        else:
+            return df
 
 
 def read_CTG_synergy_data(filename):
