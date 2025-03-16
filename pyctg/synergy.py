@@ -14,7 +14,7 @@ class CTG_synergy:
         self.wide_treatment = wide_treatment
         self.narrow_treatment = narrow_treatment
     
-    def extract_single_treatment(self, treatment_col):
+    def extract_single_treatment(self, treatment_col, value_col='effect'):
         if treatment_col == self.wide_treatment:
             other_treatment_col = self.narrow_treatment
         elif treatment_col == self.narrow_treatment:
@@ -26,10 +26,10 @@ class CTG_synergy:
         df = df.query(f'{other_treatment_col} == 0').drop(columns=[other_treatment_col])
 
         # Normalize each replicate's control (i.e. 0 treatment) for each cell type
-        control_values = df[df[treatment_col] == 0].groupby(['cell_type', 'replicate'])['ctg'].mean().reset_index()
-        control_values = control_values.rename(columns={'ctg': 'control_value'})
+        control_values = df[df[treatment_col] == 0].groupby(['cell_type', 'replicate'])[value_col].mean().reset_index()
+        control_values = control_values.rename(columns={value_col: 'control_value'})
         df = df.merge(control_values, on=['cell_type', 'replicate'])
-        df['ctg'] = df['ctg'] / df['control_value'] * 100
+        df[value_col] = df[value_col] / df['control_value'] * 100
         df = df.drop(columns=['control_value'])
 
         df = df.rename(columns={treatment_col: 'Compound Conc'})
@@ -39,7 +39,7 @@ class CTG_synergy:
 
         return df
     
-    def plot_synergy_heatmap(self, query, ax, value_col='ctg', xlabel='auto', ylabel='auto', remove_ticks=False, title=None, cmap="PRGn", colorbar=True, **args):
+    def plot_synergy_heatmap(self, query, ax, value_col='effect', xlabel='auto', ylabel='auto', remove_ticks=False, title=None, cmap="PRGn", colorbar=True, **args):
         
         # calculate bliss synergy if needed
         if value_col == 'bliss' and not 'bliss' in self.df.columns:
@@ -81,7 +81,7 @@ class CTG_synergy:
         # TODO: Use dose range from data to set x/y-ticks
         # ax.set_xticks(df.Idasanutlin.unique().round(decimals=2).astype(str).tolist())
 
-    def _ave_replicates(self, value_col='ctg'):
+    def _ave_replicates(self, value_col='effect'):
         df = self.df.copy()
         df = df.set_index(['cell_type',self.narrow_treatment,self.wide_treatment]).pivot(
             columns='replicate', values=value_col
@@ -90,7 +90,7 @@ class CTG_synergy:
         
         return df
     
-    def _calculate_bliss_synergy(self):
+    def _calculate_bliss_synergy(self,value_col='effect'):
         df = self.df.copy()
         model = Bliss()
         # https://github.com/djwooten/synergy/issues/40
@@ -98,7 +98,7 @@ class CTG_synergy:
         self.df['bliss'] = model.fit(
             df[self.wide_treatment].to_numpy(), 
             df[self.narrow_treatment].to_numpy(), 
-            df['ctg'].to_numpy()
+            df[value_col].to_numpy()
         )
 
         return df
@@ -122,5 +122,18 @@ def read_CTG_synergy_data(filename):
     # round to 3 decimals
     for col in ['ctg', narrow_treatment, wide_treatment]:
         df[col] = df[col].round(decimals=3)
+
+    # calculate relative CTG values (normalized to baseline, i.e. no treatment)
+    df['baseline'] = np.nan
+
+    for _,row in df.query(
+        f'{wide_treatment} == 0 & {narrow_treatment} == 0').iterrows():
+        df.loc[
+            (df.cell_type == row['cell_type']) & 
+            (df.replicate == row['replicate']), 
+            'baseline'] = row['ctg']
+
+    df['effect'] = df['ctg'] / df['baseline']
+    del df['baseline']
 
     return CTG_synergy(df, wide_treatment, narrow_treatment)
