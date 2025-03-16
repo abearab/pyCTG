@@ -126,7 +126,8 @@ def read_CTG_synergy_data(filename):
             (df.replicate == row['replicate']), 
             'baseline'] = row['ctg']
 
-    df['viability'] = df['ctg'] / df['baseline'] % 100
+    # % viability
+    df['viability'] = (df['ctg'] / df['baseline']) * 100 
     del df['baseline']
 
     return CTG_synergy(df, wide_treatment, narrow_treatment)
