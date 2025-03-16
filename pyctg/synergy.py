@@ -36,7 +36,7 @@ class CTG_synergy:
         
         # calculate bliss synergy if needed
         if value_col == 'bliss' and not 'bliss' in self.df.columns:
-            df = self._calculate_bliss_synergy(value_col=value_col)
+            df = self._calculate_bliss_synergy()
         
 
         df = self._ave_replicates(value_col=value_col).query(query).copy()
