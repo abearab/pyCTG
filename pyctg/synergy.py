@@ -127,7 +127,7 @@ def read_CTG_synergy_data(filename):
     df['baseline'] = np.nan
 
     for _,row in df.query(
-        f'{wide_treatment} == 0 & {narrow_treatment} == 0').iterrows():
+        f'`{wide_treatment}` == 0 & `{narrow_treatment}` == 0').iterrows():
         df.loc[
             (df.cell_type == row['cell_type']) & 
             (df.replicate == row['replicate']), 
