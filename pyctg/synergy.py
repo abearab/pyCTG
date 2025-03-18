@@ -105,10 +105,7 @@ class CTG_synergy:
                 single_plate['viability'].to_numpy()
             )
             
-            df.loc[
-                (df.cell_type == row['cell_type']) &
-                (df.replicate == row['replicate']),
-                'bliss'] = res
+            df.loc[single_plate.index, 'bliss'] = res
         
         if inplace:
             self.df = df
