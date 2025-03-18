@@ -89,7 +89,6 @@ class CTG_synergy:
 
         # https://github.com/djwooten/synergy/issues/40
         # TODO: make sure how to normalize model fit for synergy values
-        model = Bliss()
         
         df['bliss'] = np.nan
 
@@ -99,6 +98,8 @@ class CTG_synergy:
                 (df.cell_type == row['cell_type']) & 
                 (df.replicate == row['replicate']),:]
 
+            model = Bliss()
+            
             res = model.fit(
                 single_plate[self.wide_treatment].to_numpy(), 
                 single_plate[self.narrow_treatment].to_numpy(), 
