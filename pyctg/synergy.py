@@ -93,14 +93,15 @@ class CTG_synergy:
                 (df.replicate == row['replicate']),:]
 
             if method == 'bliss':
-                model = Bliss(**kwargs)
+                model = Bliss()
             elif method == 'loewe':
-                model = Loewe(mode="delta_hsa",**kwargs)
+                model = Loewe(mode="delta_hsa")
             
             res = model.fit(
-                single_plate[self.wide_treatment].to_numpy(), 
-                single_plate[self.narrow_treatment].to_numpy(), 
-                single_plate['viability'].to_numpy()
+                d1=single_plate[self.wide_treatment].to_numpy(), 
+                d2=single_plate[self.narrow_treatment].to_numpy(), 
+                E=single_plate['viability'].to_numpy(),
+                **kwargs
             )
             
             df.loc[single_plate.index, method] = res
