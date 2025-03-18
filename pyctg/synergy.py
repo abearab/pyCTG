@@ -108,34 +108,7 @@ class CTG_synergy:
         if inplace:
             self.df = df
         else:
-            return df
-
-    def calculate_loewe_synergy(self, inplace=True):
-
-        df = self.df.copy()
-
-        df['loewe'] = np.nan
-
-        for _,row in df.query(
-            f'`{self.wide_treatment}` == 0 & `{self.narrow_treatment}` == 0').iterrows():
-            single_plate = df.loc[
-                (df.cell_type == row['cell_type']) & 
-                (df.replicate == row['replicate']),:]
-
-            
-            res = model.fit(
-                single_plate[self.wide_treatment].to_numpy(), 
-                single_plate[self.narrow_treatment].to_numpy(), 
-                single_plate['viability'].to_numpy()
-            )
-            
-            df.loc[single_plate.index, 'bliss'] = res
-        
-        if inplace:
-            self.df = df
-        else:
-            return df
-        
+            return df        
     
     def _ave_replicates(self, value_col):
         df = self.df.copy()
