@@ -75,7 +75,7 @@ class CTG_synergy:
         # TODO: Use dose range from data to set x/y-ticks
         # ax.set_xticks(df.Idasanutlin.unique().round(decimals=2).astype(str).tolist())
 
-    def calculate_synergy(self, method='bliss', inplace=True):
+    def calculate_synergy(self, method='bliss', inplace=True, **kwargs):
         #TODO add checks here
         # if method not in ['bliss', 'loewe']:
 
@@ -93,9 +93,9 @@ class CTG_synergy:
                 (df.replicate == row['replicate']),:]
 
             if method == 'bliss':
-                model = Bliss()
+                model = Bliss(**kwargs)
             elif method == 'loewe':
-                model = Loewe(mode="delta_hsa")
+                model = Loewe(mode="delta_hsa",**kwargs)
             
             res = model.fit(
                 single_plate[self.wide_treatment].to_numpy(), 
