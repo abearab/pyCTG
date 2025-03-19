@@ -27,6 +27,7 @@ def read_CTG_titration_data(filename):
 
     for _,row in df.query('`Compound Conc` == 0').iterrows():
         df.loc[
+            (df.treatment == row['treatment']) & 
             (df.cell_type == row['cell_type']) & 
             (df.replicate == row['replicate']), 
             'baseline'] = row['ctg']
