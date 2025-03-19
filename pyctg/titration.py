@@ -25,8 +25,7 @@ def read_CTG_titration_data(filename):
     # calculate relative CTG values (normalized to baseline, i.e. no treatment)
     df['baseline'] = np.nan
 
-    for _,row in df.query(
-        '`Compound Conc` == 0').iterrows():
+    for _,row in df.query('`Compound Conc` == 0').iterrows():
         df.loc[
             (df.cell_type == row['cell_type']) & 
             (df.replicate == row['replicate']), 
