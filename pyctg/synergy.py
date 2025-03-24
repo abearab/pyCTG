@@ -15,7 +15,7 @@ class CTG_synergy:
         self.wide_treatment = wide_treatment
         self.narrow_treatment = narrow_treatment
     
-    def extract_single_treatment(self, treatment_col):
+    def extract_single_treatment(self, treatment_col, treatment_dose=0):
         if treatment_col == self.wide_treatment:
             other_treatment_col = self.narrow_treatment
         elif treatment_col == self.narrow_treatment:
@@ -24,7 +24,7 @@ class CTG_synergy:
             raise ValueError(f"expected {self.wide_treatment} or {self.narrow_treatment}")
 
         df = self.df.copy()
-        df = df.query(f'{other_treatment_col} == 0').drop(columns=[other_treatment_col])
+        df = df.query(f'{other_treatment_col} == {treatment_dose}').drop(columns=[other_treatment_col])
 
         df = df.rename(columns={treatment_col: 'Compound Conc'})
         df.insert(0, 'treatment', treatment_col)
